@@ -12,8 +12,7 @@ SAMPLE_RATE    = 44100
 CHANNELS       = 1
 BLOCKSIZE      = 2048
 
-# Intensites des perturbations toutes imperceptibles a l'oreille
-# Tu peux monter jusqu'a 0.01 sans entendre de difference notable
+
 HF_NOISE_LEVEL    = 0.005   # Bruit haute frequence (4k-8kHz)
 PHASE_PERTURB     = 0.003   # Perturbation de phase
 BROWN_LEVEL       = 0.002   # Bruit brun residuel basse frequence
@@ -22,7 +21,6 @@ BROWN_LEVEL       = 0.002   # Bruit brun residuel basse frequence
 raw_queue       = queue.Queue(maxsize=20)
 processed_queue = queue.Queue(maxsize=20)
 
-# Etat du generateur de bruit brun (continu entre les blocs)
 _brown_state = 0.0
 
 
@@ -99,15 +97,13 @@ def apply_phase_perturbation(signal):
     amplitude = np.abs(spectrum)
     phase     = np.angle(spectrum)
 
-    # Perturbation aleatoire de la phase uniquement
-    # PHASE_PERTURB en radians — 0.003 rad est inaudible
+
     phase_noise = np.random.uniform(-PHASE_PERTURB, PHASE_PERTURB, len(phase))
     phase_perturbed = phase + phase_noise
 
-    # Reconstruction du spectre avec nouvelle phase
+
     spectrum_perturbed = amplitude * np.exp(1j * phase_perturbed)
 
-    # Retour en temporel
     result = np.fft.irfft(spectrum_perturbed, n=len(signal)).astype(np.float32)
     return result
 
