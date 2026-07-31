@@ -26,18 +26,6 @@ _brown_state = 0.0
 
 def generate_hf_noise(frames):
     """
-    Genere un bruit cible sur les hautes frequences (4000-8000 Hz).
-
-    Methode : bruit blanc filtre par FFT
-    1. On genere du bruit blanc (toutes frequences)
-    2. On passe en domaine frequentiel (FFT)
-    3. On garde uniquement les bins correspondant a 4k-8kHz
-    4. On repasse en domaine temporel (FFT inverse)
-
-    Pourquoi 4k-8kHz ?
-    Les encodeurs vocaux utilisent cette bande pour capturer
-    les caracteristiques du timbre et des consonnes.
-    La perturber degrade la qualite de l'empreinte extraite.
     """
     # Bruit blanc
     white = np.random.normal(0, 1, frames).astype(np.float32)
@@ -81,17 +69,6 @@ def generate_brown_noise(frames):
 
 def apply_phase_perturbation(signal):
     """
-    Perturbe la phase du signal de facon imperceptible.
-
-    La phase d'un signal audio est inaudible pour l'humain
-    (notre oreille est insensible aux relations de phase absolues)
-    mais les reseaux de neurones d'encodage vocal en dependent
-    pour reconstruire le timbre avec precision.
-
-    Methode :
-    1. FFT -> obtenir amplitude + phase de chaque bin
-    2. Ajouter un bruit aleatoire a la phase (pas a l'amplitude)
-    3. FFT inverse -> signal avec phase perturbee
     """
     spectrum = np.fft.rfft(signal)
     amplitude = np.abs(spectrum)
@@ -110,13 +87,6 @@ def apply_phase_perturbation(signal):
 
 def apply_antifake(chunk):
     """
-    Applique les trois couches de protection AntiFake :
-
-    1. Perturbation de phase  — degrade l'empreinte spectrale
-    2. Bruit HF (4k-8kHz)    — degrade la capture du timbre
-    3. Bruit brun             — degrade les basses frequences
-
-    Le signal reste parfaitement comprehensible pour l'humain.
     """
     frames = len(chunk)
 
@@ -145,10 +115,6 @@ def input_callback(indata, frames, time, status):
 
 def cable_callback(outdata, frames, time, status):
     """
-    Sortie VB-Cable :
-    1. Recupere le bloc brut
-    2. Applique AntiFake
-    3. Envoie vers VB-Cable + monitoring
     """
     if status:
         print(f"[CABLE] {status}")

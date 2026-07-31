@@ -15,8 +15,6 @@ BLOCKSIZE      = 2048  # Plus grand bloc = meilleure qualite rubberband
 PITCH_SHIFT    = -1    # Demi-tons : +4 aigu, -4 grave, +12 octave
 
 
-# Une seule chaine :
-# input -> raw_queue -> traitement -> processed_queue -> cable + monitor
 raw_queue       = queue.Queue(maxsize=20)
 processed_queue = queue.Queue(maxsize=20)
 
@@ -54,11 +52,6 @@ def input_callback(indata, frames, time, status):
 
 def cable_callback(outdata, frames, time, status):
     """
-    Sortie VB-Cable :
-    1. Recupere bloc brut depuis raw_queue
-    2. Applique pitch shift via Rubber Band
-    3. Envoie vers VB-Cable
-    4. Copie le resultat dans processed_queue pour le monitoring
     """
     if status:
         print(f"[CABLE] {status}")
